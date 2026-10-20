@@ -23,10 +23,15 @@ fn run() -> Result<u8, String> {
                 let name = args.next().ok_or("--policy needs a zcashd policy name")?;
                 policy = Policy::parse(&name).ok_or_else(|| format!("unknown policy {name}"))?;
             }
+            "--version" | "-V" => {
+                println!("leakline {}", env!("CARGO_PKG_VERSION"));
+                return Ok(0);
+            }
             "--help" | "-h" => {
                 println!(
                     "\
 leakline [--policy NAME] [file]
+leakline --version
 Reads hex from a file, or from stdin when no file is given. Prints one JSON line.
 Exit 0 CLEAN, 1 LEAK, 2 usage or unreadable input.
 NAME is a zcashd policy. The default is FullPrivacy.

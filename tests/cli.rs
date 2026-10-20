@@ -55,11 +55,7 @@ fn crossing_flips_and_fee_stays_clean() {
 
 #[test]
 fn unrecognized_stays_leak_under_no_privacy() {
-    let (code, out, _) = leakline(&[
-        "--policy",
-        "NoPrivacy",
-        &example("unknown-v9.hex"),
-    ]);
+    let (code, out, _) = leakline(&["--policy", "NoPrivacy", &example("unknown-v9.hex")]);
     assert_eq!(code, 1);
     assert!(out.contains("UNRECOGNIZED"));
     assert!(out.contains("\"status\":\"LEAK\""));
@@ -85,10 +81,20 @@ fn usage_errors_exit_2() {
     assert_eq!(code, 0);
 
     let output = Command::new(env!("CARGO_BIN_EXE_leakline"))
-        .arg(&example("truncated.hex"))
+        .arg(example("truncated.hex"))
         .output()
         .expect("run");
     assert_eq!(output.status.code(), Some(2));
     let err = String::from_utf8(output.stderr).expect("stderr");
     assert!(err.contains("unreadable"), "{err}");
+}
+
+#[test]
+fn version_flag_exits_zero() {
+    let (code, out, _) = leakline(&["--version"]);
+    assert_eq!(code, 0);
+    assert_eq!(
+        out.trim(),
+        format!("leakline {}", env!("CARGO_PKG_VERSION"))
+    );
 }

@@ -178,7 +178,7 @@ fn reject_pczt_trailing(bytes: &[u8]) -> Result<(), String> {
         _ => return Ok(()),
     };
     match rest {
-        Ok(rest) if rest.is_empty() => Ok(()),
+        Ok([]) => Ok(()),
         Ok(_) => Err("trailing bytes after pczt".into()),
         Err(_) => Ok(()),
     }
@@ -217,7 +217,7 @@ fn decode_hex(text: &str) -> Result<Vec<u8>, String> {
             return Err(format!("invalid hex character {ch}"));
         }
     }
-    if cleaned.len() % 2 != 0 {
+    if !cleaned.len().is_multiple_of(2) {
         return Err("hex has an odd length".into());
     }
     if cleaned.is_empty() {
@@ -404,11 +404,15 @@ mod tests {
         expect_example("unknown-v9.hex", &unknown_v9());
         expect_example("empty-nu6.pczt.hex", &empty_nu6_pczt());
 
-        let crossing = inspect_bytes(&read_example("crossing-v5.hex"), Policy::FullPrivacy).unwrap();
+        let crossing =
+            inspect_bytes(&read_example("crossing-v5.hex"), Policy::FullPrivacy).unwrap();
         assert_eq!(crossing.status, Status::Leak);
         assert_eq!(crossing.codes, vec![Code::PoolCrossing]);
-        let opened =
-            inspect_bytes(&read_example("crossing-v5.hex"), Policy::AllowRevealedAmounts).unwrap();
+        let opened = inspect_bytes(
+            &read_example("crossing-v5.hex"),
+            Policy::AllowRevealedAmounts,
+        )
+        .unwrap();
         assert_eq!(opened.status, Status::Clean);
     }
 
