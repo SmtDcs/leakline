@@ -30,3 +30,9 @@ DeepSeek testi kendisi çalıştırdı: `cargo test --offline` çıkış 0, 22 t
 
 - `pczt::parse` hatası çıkış 2'dir. `UNRECOGNIZED`, PCZT ayrıştıktan sonra destek kontrolü başarısızsa konur.
 - v4, v5 ve v6 cümlesi ham işlem içindir. PCZT yalnız desteklenen v5 (boş Ironwood) veya v6'dır. v4 PCZT `UNRECOGNIZED` kalır.
+
+Üçüncü turda karar hatası yok. `cargo test --offline` çıkış 0, 22 test. Üç yazım farkı kaldı. Kod yine değişmedi:
+
+- İki havuz, `FullPrivacy` altında transparent parça olmasa da `CLEAN` olmaz. `AllowRevealedAmounts` o kodu kabul eder.
+- Bilinmeyen consensus branch, sürüm okunduğu için çıkış `2` değil, `UNRECOGNIZED`. Policy kapısındaki eşleme duruyor.
+- v5 PCZT kuralı "boş Ironwood demeti" değil. Koşul: Ironwood eylemi yok ve `value_sum` sıfır. Diğer Ironwood alanları bakılmaz.
