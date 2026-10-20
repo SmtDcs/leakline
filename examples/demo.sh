@@ -38,6 +38,8 @@ show FullPrivacy examples/testnet/clean-shielded-v6.pczt.hex 0
 show FullPrivacy examples/testnet/leak-transparent-v6.hex 1
 show AllowRevealedRecipients examples/testnet/leak-transparent-v6.hex 0
 show FullPrivacy examples/testnet/clean-shielded-v6.hex 0
+show FullPrivacy examples/testnet/shield-transparent-input-v6.hex 1
+show AllowRevealedSenders examples/testnet/shield-transparent-input-v6.hex 0
 
 set +e
 "$bin" examples/truncated.hex >/dev/null

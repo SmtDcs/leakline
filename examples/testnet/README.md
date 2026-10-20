@@ -4,12 +4,13 @@ Real bytes from public Zcash testnet, made on 20–21 Oct 2026 with throwaway wa
 [zcash-devtool](https://github.com/zcash/zcash-devtool) against `testnet.zec.rocks:443`.
 Funds came from the Valar testnet faucet. No mainnet keys or funds were involved.
 
-All four are NU6.3 (branch id `0x37a5165b`) v6 transactions spending from the Ironwood pool.
+All five are NU6.3 (branch id `0x37a5165b`) v6 transactions spending from or into the Ironwood pool.
 
 | File | What it is | Leakline (`FullPrivacy`) |
 |---|---|---|
 | `leak-transparent-v6.hex` | Signed tx `809a1dc3e2d4475811fb28d82760f134517bb2a8dc7db01af70dcae32528a890`. Pays 0.01 TAZ to a transparent `tm…` address, change back to Ironwood | `LEAK`, `REVEALED_RECIPIENT` |
 | `clean-shielded-v6.hex` | Signed tx `27c7fc1f569307c662076681d478504adff5683879f043a847e0742712b9f70a`. Ironwood → unified address, fully shielded | `CLEAN`, `FEE_CANDIDATE` (the 10000 zat fee) |
+| `shield-transparent-input-v6.hex` | Signed tx `e42375480680cc0f6b909d39c20825ffae3d564a5cdd39ecfda557490d9aad39`. Shields the 0.01 TAZ that the leak tx above paid to a throwaway `tm…` address into Ironwood (`wallet shield`). Spends a transparent input | `LEAK`, `REVEALED_SENDER` |
 | `leak-transparent-v6.pczt.hex` | Unproven, unsigned PCZT for the same kind of transparent payment (`pczt create`) | `LEAK`, `REVEALED_RECIPIENT`, `PCZT_METADATA` |
 | `clean-shielded-v6.pczt.hex` | Unproven, unsigned PCZT for a shielded payment to a unified address. Never signed or broadcast | `CLEAN`, `FEE_CANDIDATE`, `PCZT_METADATA` |
 

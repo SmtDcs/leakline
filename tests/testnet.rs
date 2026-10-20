@@ -56,3 +56,15 @@ fn testnet_shielded_pczt_is_clean_with_metadata_warning() {
     assert!(out.contains("\"codes\":[\"FEE_CANDIDATE\",\"PCZT_METADATA\"]"));
     assert!(out.contains("\"transparent_output_zatoshis\":[]"));
 }
+
+#[test]
+fn testnet_transparent_input_reveals_sender() {
+    let (code, out) = run("FullPrivacy", "shield-transparent-input-v6.hex");
+    assert_eq!(code, 1, "{out}");
+    assert!(out.contains("\"codes\":[\"REVEALED_SENDER\"]"));
+    assert!(out.contains("\"transparent_output_zatoshis\":[]"));
+    assert!(out.contains("\"ironwood_zatoshis\":-985000"));
+
+    let (code, _) = run("AllowRevealedSenders", "shield-transparent-input-v6.hex");
+    assert_eq!(code, 0);
+}

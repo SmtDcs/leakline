@@ -54,7 +54,7 @@ if verdict.status == Status::Leak {
 
 ## Real testnet examples
 
-`examples/testnet/` has bytes from public testnet (NU6.3, v6, Ironwood): a signed transparent payment, a signed shielded payment, and an unsigned PCZT of each kind. Tx ids and the commands to reproduce them are in [`examples/testnet/README.md`](examples/testnet/README.md). The other files in `examples/` are small synthetic fixtures for the edge cases.
+`examples/testnet/` has bytes from public testnet (NU6.3, v6, Ironwood): a signed transparent payment, a signed shielded payment, a signed shielding tx that spends a transparent input (`REVEALED_SENDER`), and an unsigned PCZT for the transparent and shielded payments. Tx ids and the commands to reproduce them are in [`examples/testnet/README.md`](examples/testnet/README.md). The other files in `examples/` are small synthetic fixtures for the edge cases.
 
 ## Ironwood (NU6.3)
 
@@ -109,7 +109,6 @@ Same bytes, two policies, two exit codes. `examples/transparent-v5.hex` is `LEAK
 - ZIP-317 fee anomalies, linked transparent inputs, or a ZIP-321 payment-request match.
 - A constructed or broadcast transaction, or a check that a signature or a proof is valid. A `CLEAN` or `LEAK` byte string can still be rejected by a node.
 - That every file in `examples/` is a signed transaction. The files in `examples/testnet/` are real testnet bytes; the two PCZTs there are unproven and unsigned. The other files are structural fixtures with zero signatures and proofs. Do not broadcast them. `examples/truncated.hex` is a four-byte header and exits `2`. `examples/unknown-v9.hex` is `UNRECOGNIZED`.
-- `REVEALED_SENDER` from a real file. No testnet example spends a transparent input yet; the code is covered by the decision table and the policy tests.
 
 ## How this differs from nearby tools
 
