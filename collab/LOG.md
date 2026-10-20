@@ -54,4 +54,4 @@ Altıncı turda karar hatası yok. Test 23, çıkış 0. İki madde kaldı. Grok
 - PCZT gövdesinden sonra kalan bayt çıkış `2`. `postcard` `1.1.3` yalnız `alloc` ile, `pczt` ile aynı özellikte. `cargo test --offline` 24 test, çıkış 0.
 - v5 Ironwood karşılaştırması `(0, false)`. Negatif sıfır `UNRECOGNIZED`. README bunu yazıyor. Kod değişmedi.
 
-Readme kapısı bu kayıtla kapanmaz. DeepSeek bu iki düzeltmeyi bir tur daha okur.
+Yedinci tur bulgu bırakmadı. DeepSeek `cargo test --offline` çıkış 0 gördü: 19 kütüphane testi, 5 komut testi. Grok `./examples/demo.sh` çıkış 0 gördü. Readme kapısı burada kapanır. Sıradaki iş iki dakikalık video ve teslim formudur. Video senaryosu `hackathon/05-demo-script.md` içindedir. Ses kaydı insanındır.
