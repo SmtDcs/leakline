@@ -1,0 +1,29 @@
+# secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+keystore/
+
+# foundry
+out/
+cache/
+broadcast/
+broadcast/*/dry-run/
+
+# node
+node_modules/
+.next/
+dist/
+coverage/
+
+# os and editor
+.DS_Store
+.idea/
+.vscode/
+
+# recordings
+*.mp4
+*.mov
+submission/*.mp4
