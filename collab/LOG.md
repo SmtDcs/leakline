@@ -16,4 +16,12 @@ DeepSeek `cargo test --offline` çalıştırdı: o andaki 11 test geçti. Kaynak
 - `PCZT_METADATA` Orchard ve Ironwood alanlarına da bakar. Merkle witness uyarı değildir.
 - Sapling ve Orchard bakiyesi olan bir v5 bayt dizisi iki politikada iki çıkış verir. `cargo test` 15 geçti.
 
-İkinci DeepSeek turu aynı 15 testi geçirdi ve karar hatası bulmadı. Üç delil notu vardı. Transparent çıktının gevşek politikada `CLEAN` olması hem karar tablosunda hem v5 baytında teste bağlandı. Kullanılmayan change alanı silindi. Boş olmayan PCZT, bu crate'in açık API'siyle kurulamıyor; o fark karar tablosunda ve imzalı baytta duruyor.
+İkinci DeepSeek turu aynı 15 testi geçirdi ve karar hatası bulmadı. Üç delil notu vardı. Transparent çıktının gevşek politikada `CLEAN` olması hem karar tablosunda hem v5 baytında teste bağlandı. Kullanılmayan change alanı silindi. Boş olmayan PCZT, bu crate'in açık API'siyle kurulamıyor; o fark karar tablosunda ve yapısal v5 serileştirmesinde durur.
+
+## readme — 2026-10-20
+
+DeepSeek testi kendisi çalıştırdı: `cargo test --offline` çıkış 0, 22 test. Karar hatası yok. Üç yazım iddiası spec ile çelişiyordu. Grok kabul etti:
+
+- Çıkış 2 JSON basmaz. Hata stderr'e gider.
+- `examples/` içindeki her dosya ayrışmaz. `truncated.hex` çıkış 2, `unknown-v9.hex` `UNRECOGNIZED`.
+- v5 örnekleri imzalı değildir. İmza doğrulanmaz. Bu dosyalar alıcıyı ve havuz bakiyesini taşır. `REVEALED_SENDER` v5 dosyasında değil, karar tablosunda ve politika testindedir.

@@ -2,13 +2,13 @@
 
 Leakline reads a Zcash transaction before it is broadcast and says whether the amount would be public.
 
-A signer, a CI job, or a hardware companion that did not build the transaction gives it the bytes. The tool prints one line of JSON and exits `0` for `CLEAN`, `1` for `LEAK`, or `2` when the input cannot be read. Nothing is uploaded. No key is requested.
+A signer, a CI job, or a hardware companion that did not build the transaction gives it the bytes. A verdict prints one JSON line and exits `0` for `CLEAN` or `1` for `LEAK`. Unreadable input prints an error on stderr and exits `2`, with no JSON line. Nothing is uploaded. No key is requested.
 
 Track: ZECATHON Core & Tooling. Deadline: 2026-10-28 23:59 UTC.
 
 ## What it claims
 
-The input is hex of a PCZT (the bytes start with the ASCII magic `PCZT`) or of a signed transaction. The parser is `zcash_primitives` `0.31.0-pre.2` and `pczt` `0.10.0-pre.2`. Circuit, prover, and tx-extractor features are off. There is no hand-written bundle parser.
+The input is hex of a PCZT (the bytes start with the ASCII magic `PCZT`) or of a serialized v4, v5, or v6 transaction. Signatures and proofs are not checked. The parser is `zcash_primitives` `0.31.0-pre.2` and `pczt` `0.10.0-pre.2`. Circuit, prover, and tx-extractor features are off. There is no hand-written bundle parser.
 
 Recognized transaction versions are v4, v5, and v6. A version outside that set, or a bundle the library rejects for a reason other than running out of bytes, is `LEAK` with code `UNRECOGNIZED`. That stays `LEAK` under every policy, including `NoPrivacy`. Empty input, odd-length hex, and a read that stops early (`UnexpectedEof`, including a truncated header) are not a verdict: exit `2`.
 
@@ -49,8 +49,9 @@ Same bytes, two policies, two exit codes. `examples/transparent-v5.hex` is `LEAK
 - ZIP-32 or BIP-32 derivation paths. Those getters are not public in `pczt` `0.10.0-pre.2`, so the paths are not read.
 - A Merkle witness as metadata. A witness is not `PCZT_METADATA`.
 - ZIP-317 fee anomalies, linked transparent inputs, or a ZIP-321 payment-request match.
-- A constructed or broadcast transaction. The demo files are structural fixtures. Several proofs are empty. Do not broadcast them.
-- A non-empty PCZT built through this crate's public API. The public roles can build an empty Nu6 PCZT. They cannot add inputs or a value sum. The two-policy flip for those fields is covered by the signed v5 fixtures and by the decision table in `hackathon/10-pair-system.md`.
+- A constructed or broadcast transaction, or a check that a signature or a proof is valid. A `CLEAN` or `LEAK` byte string can still be rejected by a node.
+- That every file in `examples/` is a parsed, signed transaction. The v5 files and the empty PCZT are structural fixtures. The crossing file uses zero spend-auth and binding signatures, and its proofs are empty. Do not broadcast them. `examples/truncated.hex` exits `2`. `examples/unknown-v9.hex` is `UNRECOGNIZED`.
+- A non-empty PCZT built through this crate's public API. The public roles can build an empty Nu6 PCZT. They cannot add inputs or a value sum. The v5 fixtures cover a transparent recipient and the Sapling and Orchard value balances. `REVEALED_SENDER` is covered by the decision table and the policy test, not by a v5 file. See `hackathon/10-pair-system.md`.
 
 ## How this differs from nearby tools
 

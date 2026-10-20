@@ -23,6 +23,6 @@ A `CLEAN` result means the selected policy allows every code this build can see.
 
 `PCZT_METADATA` sees only `proprietary`, `user_address`, and `dummy_sk`. ZIP-32 and BIP-32 paths are not readable in this crate version. A transparent output is never labeled as change.
 
-The files in `examples/` parse. They are not valid zero-knowledge proofs. Do not broadcast them.
+The v5 fixtures and the empty Nu6 PCZT parse as structure. They are not valid zero-knowledge proofs, and their signatures are not real. Do not broadcast them. `examples/truncated.hex` is rejected before a verdict. `examples/unknown-v9.hex` is `UNRECOGNIZED`.
 
 `AllowLinkingAccountAddresses` does not discover other addresses of an account. The bytes do not contain that information.
