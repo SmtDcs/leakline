@@ -35,7 +35,7 @@ Yok. Zcash'te bu ürün için sözleşme yok.
 ## Data flow
 
 1. Çağıran bir `.pczt` veya ham işlem hex'i verir. İsteğe bağlı `--policy FullPrivacy`.
-2. Kütüphane sürümü tanır. v4 ve v5 dışı, ya da tanınmayan demet, `LEAK` / `UNRECOGNIZED`.
+2. Kütüphane sürümü tanır. v4, v5 ve v6 okunur. Bunların dışı, ya da tanınmayan demet, `LEAK` / `UNRECOGNIZED`.
 3. Transparent girdi, transparent çıktı ve shielded bakiyeler okunur.
 4. İki shielded havuzun bakiyesi tutarı düz metin gösteriyorsa `LEAK` / `POOL_CROSSING`.
 5. Seçilen politika bu açıklamaya izin veriyorsa sonuç `CLEAN` olabilir. Varsayılan `FullPrivacy` izin vermez.

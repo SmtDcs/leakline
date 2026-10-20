@@ -2,7 +2,8 @@
 
 use zcash_primitives::transaction::{Transaction, TxVersion};
 use zcash_protocol::{
-    consensus::BranchId,
+    consensus::{BranchId, OrchardProtocolRevision},
+    constants::{V5_TX_VERSION, V5_VERSION_GROUP_ID, V6_TX_VERSION, V6_VERSION_GROUP_ID},
     value::{ZatBalance, Zatoshis},
 };
 
@@ -47,6 +48,12 @@ fn inspect_transaction(bytes: &[u8], policy: Policy) -> Result<Verdict, String> 
         }
     };
 
+    if !matches!(tx.version(), TxVersion::V4 | TxVersion::V5 | TxVersion::V6) {
+        let mut exposure = Exposure::empty_shielded();
+        exposure.recognized = false;
+        return Ok(inspect(&exposure, policy));
+    }
+
     let mut exposure = Exposure::empty_shielded();
     if let Some(bundle) = tx.transparent_bundle() {
         exposure.transparent_input_count = u32::try_from(bundle.vin.len()).unwrap_or(u32::MAX);
@@ -74,7 +81,15 @@ fn inspect_transaction(bytes: &[u8], policy: Policy) -> Result<Verdict, String> 
 
 fn inspect_pczt(bytes: &[u8], policy: Policy) -> Result<Verdict, String> {
     let pczt = pczt::parse(bytes).map_err(|err| format!("unreadable pczt: {err}"))?;
+    if !pczt_supported(&pczt) {
+        let mut exposure = Exposure::empty_shielded();
+        exposure.recognized = false;
+        return Ok(inspect(&exposure, policy));
+    }
     let mut exposure = Exposure::empty_shielded();
+    if !pczt.global().proprietary().is_empty() {
+        exposure.pczt_metadata = true;
+    }
 
     let inputs = pczt.transparent().inputs();
     exposure.transparent_input_count = u32::try_from(inputs.len()).unwrap_or(u32::MAX);
@@ -103,7 +118,7 @@ fn inspect_pczt(bytes: &[u8], policy: Policy) -> Result<Verdict, String> {
     exposure.ironwood_zatoshis = signed_magnitude(*pczt.ironwood().value_sum())?;
 
     for spend in pczt.sapling().spends() {
-        if spend.witness().is_some() || !spend.proprietary().is_empty() {
+        if !spend.proprietary().is_empty() {
             exposure.pczt_metadata = true;
         }
     }
@@ -112,8 +127,41 @@ fn inspect_pczt(bytes: &[u8], policy: Policy) -> Result<Verdict, String> {
             exposure.pczt_metadata = true;
         }
     }
+    for bundle in [pczt.orchard(), pczt.ironwood()] {
+        for action in bundle.actions() {
+            let spend = action.spend();
+            let output = action.output();
+            if !spend.proprietary().is_empty()
+                || spend.dummy_sk().is_some()
+                || !output.proprietary().is_empty()
+                || output.user_address().is_some()
+            {
+                exposure.pczt_metadata = true;
+            }
+        }
+    }
 
     Ok(inspect(&exposure, policy))
+}
+
+fn pczt_supported(pczt: &pczt::Pczt) -> bool {
+    let global = pczt.global();
+    let Ok(branch) = BranchId::try_from(*global.consensus_branch_id()) else {
+        return false;
+    };
+    let Some(revision) = branch.orchard_protocol_revision() else {
+        return false;
+    };
+    let version_ok = match (*global.tx_version(), *global.version_group_id()) {
+        (V5_TX_VERSION, V5_VERSION_GROUP_ID) => ironwood_empty(pczt.ironwood()),
+        (V6_TX_VERSION, V6_VERSION_GROUP_ID) => revision >= OrchardProtocolRevision::V3,
+        _ => false,
+    };
+    version_ok
+}
+
+fn ironwood_empty(bundle: &pczt::orchard::Bundle) -> bool {
+    bundle.actions().is_empty() && *bundle.value_sum() == (0, false)
 }
 
 fn signed_magnitude(value: (u64, bool)) -> Result<i64, String> {
@@ -210,5 +258,103 @@ mod tests {
     fn truncated_bytes_are_a_usage_error() {
         let err = inspect_bytes(&[0x05], Policy::FullPrivacy).unwrap_err();
         assert!(err.contains("unreadable"));
+    }
+
+    #[test]
+    fn v3_is_unrecognized() {
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&0x8000_0003u32.to_le_bytes());
+        bytes.extend_from_slice(&0x03C4_8270u32.to_le_bytes());
+        bytes.extend_from_slice(&[0x00, 0x00]);
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.push(0x00);
+        let verdict = inspect_bytes(&bytes, Policy::NoPrivacy).unwrap();
+        assert_eq!(verdict.status, Status::Leak);
+        assert_eq!(verdict.codes, vec![Code::Unrecognized]);
+    }
+
+    #[test]
+    fn empty_v6_is_clean() {
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&0x8000_0006u32.to_le_bytes());
+        bytes.extend_from_slice(&0xD884_B698u32.to_le_bytes());
+        bytes.extend_from_slice(&0x37a5_165bu32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&[0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+        let verdict = inspect_bytes(&bytes, Policy::FullPrivacy).unwrap();
+        assert_eq!(verdict.status, Status::Clean);
+        assert!(verdict.codes.is_empty());
+    }
+
+    #[test]
+    fn sapling_orchard_bytes_cross_under_two_policies() {
+        let bytes = crossing_v5();
+        let locked = inspect_bytes(&bytes, Policy::FullPrivacy).unwrap();
+        assert_eq!(locked.status, Status::Leak);
+        assert_eq!(locked.exit_code, 1);
+        assert_eq!(locked.codes, vec![Code::PoolCrossing]);
+        assert_eq!(locked.sapling_zatoshis, 5_0000_0000);
+        assert_eq!(locked.orchard_zatoshis, -4_9900_0000);
+        assert!(locked.transparent_output_zatoshis.is_empty());
+        let opened = inspect_bytes(&bytes, Policy::AllowRevealedAmounts).unwrap();
+        assert_eq!(opened.status, Status::Clean);
+        assert_eq!(opened.exit_code, 0);
+        assert_eq!(opened.codes, vec![Code::PoolCrossing]);
+    }
+
+    #[test]
+    fn empty_nu6_pczt_is_clean() {
+        let pczt = pczt::roles::creator::Creator::new(
+            u32::from(BranchId::Nu6),
+            0,
+            133,
+            Some([0; 32]),
+            Some([0; 32]),
+        )
+        .expect("creator")
+        .build()
+        .expect("build")
+        .serialize()
+        .expect("serialize");
+        let verdict = inspect_bytes(&pczt, Policy::FullPrivacy).unwrap();
+        assert_eq!(verdict.status, Status::Clean);
+    }
+
+    fn crossing_v5() -> Vec<u8> {
+        use group::{Group, GroupEncoding};
+        let jubjub = jubjub::SubgroupPoint::generator().to_bytes();
+        let pallas = pasta_curves::pallas::Point::generator().to_bytes();
+        redjubjub::VerificationKey::<redjubjub::SpendAuth>::try_from(jubjub)
+            .expect("jubjub generator is a verification key");
+
+        let mut bytes = v5_header();
+        bytes.extend_from_slice(&[0x00, 0x00]);
+        bytes.push(0x01);
+        bytes.extend_from_slice(&jubjub);
+        bytes.extend_from_slice(&[1; 32]);
+        bytes.extend_from_slice(&jubjub);
+        bytes.push(0x00);
+        bytes.extend_from_slice(&5_0000_0000i64.to_le_bytes());
+        bytes.extend_from_slice(&[0; 32]);
+        bytes.extend_from_slice(&[0; 192]);
+        bytes.extend_from_slice(&[0; 64]);
+        bytes.extend_from_slice(&[0; 64]);
+        bytes.push(0x01);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&[0; 32]);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&[0; 580]);
+        bytes.extend_from_slice(&[0; 80]);
+        bytes.push(0x03);
+        bytes.extend_from_slice(&(-4_9900_0000i64).to_le_bytes());
+        bytes.extend_from_slice(&[0; 32]);
+        bytes.push(0x00);
+        bytes.extend_from_slice(&[0; 64]);
+        bytes.extend_from_slice(&[0; 64]);
+        bytes
     }
 }

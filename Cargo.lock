@@ -679,8 +679,12 @@ dependencies = [
 name = "leakline"
 version = "0.1.0"
 dependencies = [
+ "group",
  "hex",
+ "jubjub",
+ "pasta_curves",
  "pczt",
+ "redjubjub",
  "zcash_primitives",
  "zcash_protocol",
 ]
@@ -1010,6 +1014,7 @@ checksum = "19ff57b3369b472353110bea305ced2612a1380e2d2079dd26c200ed42064421"
 dependencies = [
  "rand_core 0.10.1",
  "reddsa",
+ "serde",
  "thiserror",
  "zeroize",
 ]

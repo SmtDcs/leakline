@@ -58,7 +58,7 @@ Okunan alanlar: sürüm, transparent girdi sayısı, transparent çıktı tutarl
 | `POOL_CROSSING` | Sapling ve Orchard bakiyeleri ikisi de sıfır değil | İki bakiye de yazılır |
 | `FEE_CANDIDATE` | Tek havuzun bakiyesi sıfır değil ve transparent parça yok | Bilgi. Tek başına `LEAK` yapmaz |
 | `PCZT_METADATA` | PCZT içinde açık cüzdan yolu veya benzeri metadata | Uyarı. Tek başına `LEAK` yapmaz |
-| `UNRECOGNIZED` | Sürüm v4/v5 değil, ya da kütüphane demeti reddetti | Karar `LEAK` |
+| `UNRECOGNIZED` | Sürüm v4, v5 veya v6 değil, ya da kütüphane demeti reddetti | Karar `LEAK` |
 
 Para üstü kodu yalnız PCZT o çıktıyı change diye işaretlediyse konur. Bu, FullPrivacy altında transparent çıktıyı gizlemez: adres yine açıktır, kod `REVEALED_RECIPIENT` kalır. Ham işlemde change tahmini yapılmaz.
 
@@ -77,10 +77,12 @@ Adlar `zcashd` adlarıdır. Varsayılan `FullPrivacy`. Daha gevşek politika, ke
 | `AllowRevealedRecipients` | öncekiler + `REVEALED_RECIPIENT` |
 | `AllowRevealedSenders` | `AllowRevealedAmounts` + `REVEALED_SENDER` |
 | `AllowFullyTransparent` | alıcı, gönderen ve havuz geçişi |
-| `AllowLinkingAccountAddresses` | bayt düzeyinde `AllowFullyTransparent` ile aynı |
+| `AllowLinkingAccountAddresses` | `AllowRevealedSenders` ile aynı: havuz geçişi ve gönderen. Alıcı yok |
 | `NoPrivacy` | `UNRECOGNIZED` dışında hiçbir kod kararı `LEAK` yapmaz; kodlar listede durur |
 
-`AllowLinkingAccountAddresses` hesabın başka adreslerini bayttan göremez. README bunu iddia dışı bırakır.
+`zcashd` politikaları tam bir sıradan çok kısmi bir sıra kurar. `AllowLinkingAccountAddresses` göndereni ve havuz geçişini kabul eder, transparent alıcıyı kabul etmez. Hesabın başka adreslerini bayttan göremez. README bunu iddia dışı bırakır.
+
+`PCZT_METADATA` yalnız bu crate sürümünün açık bıraktığı alanlara bakar: `proprietary`, `user_address`, `dummy_sk`. Merkle witness uyarı değildir. ZIP-32 ve BIP-32 yollarının getter'ı yoktur; o yollar bu sürümde okunamaz. Public bir change bayrağı da yoktur, para üstü hiç işaretlenmez.
 
 İzin verilmeyen bir kod varsa karar `LEAK`, çıkış `1`. Yoksa `CLEAN`, çıkış `0`. Bozuk hex ve okunamayan başlık çıkış `2`. Sürüm okunup tanınmıyorsa çıkış `1`, kod `UNRECOGNIZED`. `UNRECOGNIZED`, `NoPrivacy` dahil her politikada `LEAK` kalır. DeepSeek spec kapısı 2026-10-20'de bu istisnayı işaret etti; tablo ona göre düzeltildi.
 

@@ -54,10 +54,10 @@ impl Policy {
             Self::AllowRevealedRecipients => {
                 matches!(code, Code::PoolCrossing | Code::RevealedRecipient)
             }
-            Self::AllowRevealedSenders => {
+            Self::AllowRevealedSenders | Self::AllowLinkingAccountAddresses => {
                 matches!(code, Code::PoolCrossing | Code::RevealedSender)
             }
-            Self::AllowFullyTransparent | Self::AllowLinkingAccountAddresses => matches!(
+            Self::AllowFullyTransparent => matches!(
                 code,
                 Code::PoolCrossing | Code::RevealedRecipient | Code::RevealedSender
             ),
@@ -304,6 +304,15 @@ mod tests {
             Status::Clean
         );
         assert_eq!(inspect(&tx, Policy::FullPrivacy).status, Status::Leak);
+        assert_eq!(
+            inspect(&tx, Policy::AllowLinkingAccountAddresses).status,
+            Status::Clean
+        );
+        tx.transparent_output_zatoshis = vec![50_000];
+        assert_eq!(
+            inspect(&tx, Policy::AllowLinkingAccountAddresses).status,
+            Status::Leak
+        );
         assert!(inspect(&tx, Policy::FullPrivacy)
             .transparent_input_zatoshis
             .is_none());
