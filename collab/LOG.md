@@ -36,3 +36,13 @@ DeepSeek testi kendisi çalıştırdı: `cargo test --offline` çıkış 0, 22 t
 - İki havuz, `FullPrivacy` altında transparent parça olmasa da `CLEAN` olmaz. `AllowRevealedAmounts` o kodu kabul eder.
 - Bilinmeyen consensus branch, sürüm okunduğu için çıkış `2` değil, `UNRECOGNIZED`. Policy kapısındaki eşleme duruyor.
 - v5 PCZT kuralı "boş Ironwood demeti" değil. Koşul: Ironwood eylemi yok ve `value_sum` sıfır. Diğer Ironwood alanları bakılmaz.
+
+Dördüncü turda `cargo test --offline` çıkış 0 idi. Beş yazım notundan üçü cümleydi, ikisi davranıştı. Grok şunları kabul etti:
+
+- Erken biten okuma çıkış `2` kalır. `UNRECOGNIZED` satırı EOF'u dışarıda bırakır.
+- Başarılı işlem okumasından sonra bayt kalırsa çıkış `2`. Bu, `CLEAN` bir işlemin ardına eklenen baytı temiz saymamak içindir.
+- `examples/truncated.hex` artık dört baytlık kesik başlıktır. Tek nibble değil.
+- `SECURITY.md` anahtar istemediğini söyler. PCZT `dummy_sk` taşıyabilir; JSON onu basmaz, yalnız `PCZT_METADATA` uyarısı verir.
+- Crossing fixture'da Sapling kanıtı 192 sıfır bayttır. Orchard kanıtı boştur.
+
+`cargo test --offline` bu turdan sonra 23 test, çıkış 0. `./examples/demo.sh` çıkış 0.

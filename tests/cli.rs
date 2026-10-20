@@ -89,4 +89,6 @@ fn usage_errors_exit_2() {
         .output()
         .expect("run");
     assert_eq!(output.status.code(), Some(2));
+    let err = String::from_utf8(output.stderr).expect("stderr");
+    assert!(err.contains("unreadable"), "{err}");
 }

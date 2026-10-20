@@ -10,7 +10,7 @@ Leakline is a local checker. It is not a wallet, a node, or a deployed contract.
 
 ## What it refuses
 
-- Spending keys, viewing keys, and seeds. There is no field for them.
+- A request for a spending key, a viewing key, or a seed. The command has no such argument, and the JSON does not print key bytes. A PCZT container can still carry `dummy_sk` or a viewing key. When `dummy_sk` is present it is reported only as the warning `PCZT_METADATA`.
 - Broadcasting a transaction, or opening a network connection. The binary does not fetch an explorer.
 - Inventing a transparent input amount the bytes do not carry. A raw transaction reports that amount as `null`.
 - Treating an unrecognized version as `CLEAN`.

@@ -36,7 +36,8 @@ fn inspect_transaction(bytes: &[u8], policy: Policy) -> Result<Verdict, String> 
         Err(err) => return Err(format!("unreadable transaction: {err}")),
     }
 
-    let tx = match Transaction::read(std::io::Cursor::new(bytes), V4_BRANCH_HINT) {
+    let mut body = std::io::Cursor::new(bytes);
+    let tx = match Transaction::read(&mut body, V4_BRANCH_HINT) {
         Ok(tx) => tx,
         Err(err) if err.kind() == std::io::ErrorKind::UnexpectedEof => {
             return Err(format!("unreadable transaction: {err}"));
@@ -47,6 +48,9 @@ fn inspect_transaction(bytes: &[u8], policy: Policy) -> Result<Verdict, String> 
             return Ok(inspect(&exposure, policy));
         }
     };
+    if body.position() != u64::try_from(bytes.len()).unwrap_or(u64::MAX) {
+        return Err("trailing bytes after transaction".into());
+    }
 
     if !matches!(tx.version(), TxVersion::V4 | TxVersion::V5 | TxVersion::V6) {
         let mut exposure = Exposure::empty_shielded();
@@ -292,6 +296,14 @@ mod tests {
     fn truncated_bytes_are_a_usage_error() {
         let err = inspect_bytes(&[0x05], Policy::FullPrivacy).unwrap_err();
         assert!(err.contains("unreadable"));
+    }
+
+    #[test]
+    fn trailing_transaction_bytes_are_a_usage_error() {
+        let mut bytes = empty_v5();
+        bytes.push(0x00);
+        let err = inspect_bytes(&bytes, Policy::FullPrivacy).unwrap_err();
+        assert!(err.contains("trailing"));
     }
 
     #[test]
