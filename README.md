@@ -1,10 +1,64 @@
 # Leakline
 
-Leakline reads a Zcash transaction before it is broadcast and says whether the amount would be public.
+Leakline reads a Zcash transaction or PCZT before it is signed or broadcast, and tells you whether it would make an amount, a sender, or a recipient public. One JSON line, one exit code. Offline, no keys.
 
-A signer, a CI job, or a hardware companion that did not build the transaction gives it the bytes. A verdict prints one JSON line and exits `0` for `CLEAN` or `1` for `LEAK`. Some inputs are not a verdict: they print an error on stderr and exit `2`. Those cases are listed below. Nothing is uploaded. No key is requested.
+Track: ZECATHON Core & Tooling.
 
-Track: ZECATHON Core & Tooling. Deadline: 2026-10-28 23:59 UTC.
+## Why
+
+PCZTs split building a transaction from signing it. The signer (a hardware wallet, a multisig co-signer, a CI job, a custody service) often gets bytes that some other program built. Before signing, it should be able to ask: does this leak?
+
+Zallet is running into exactly this. [zcash/zallet#531](https://github.com/zcash/zallet/pull/531) adds `z_proposetransaction` / `z_finalizetransaction`. `z_proposetransaction` reports the privacy policy a PCZT needs, and `z_finalizetransaction` checks the caller's policy against it, but only from a cache filled at proposal time. On a cache miss (restart, eviction, or a PCZT proposed elsewhere) the PR says the requirement "cannot be re-derived faithfully from the PCZT", so the caller's policy is taken as acknowledgement only. The design is discussed in [zcash/zallet#217](https://github.com/zcash/zallet/issues/217).
+
+Leakline derives the verdict from the bytes alone, using the `zcashd` policy names, so it works on a PCZT that nobody cached.
+
+## Quick start
+
+```bash
+cargo build --release
+./target/release/leakline examples/testnet/leak-transparent-v6.pczt.hex; echo "exit $?"
+./target/release/leakline --policy AllowRevealedRecipients examples/testnet/leak-transparent-v6.pczt.hex; echo "exit $?"
+od -An -v -tx1 my.pczt | tr -d ' \n' | ./target/release/leakline   # stdin works too
+```
+
+```
+{"status":"LEAK","policy":"FullPrivacy","exit":1,"codes":["REVEALED_RECIPIENT","PCZT_METADATA"],"transparent_input_zatoshis":null,"transparent_output_zatoshis":[1000000],"sprout_zatoshis":0,"sapling_zatoshis":0,"orchard_zatoshis":0,"ironwood_zatoshis":1015000}
+```
+
+| Exit | Meaning |
+|---|---|
+| `0` | `CLEAN` under the chosen policy |
+| `1` | `LEAK` under the chosen policy (includes `UNRECOGNIZED`) |
+| `2` | Not a verdict: bad hex, empty input, truncated or trailing bytes, PCZT that does not parse, bad arguments |
+
+Flags: `--policy NAME` (default `FullPrivacy`), `--version`, `--help`.
+
+A pre-signing gate is one line:
+
+```bash
+leakline --policy FullPrivacy proposal.pczt.hex && zcash-devtool pczt sign ... 
+```
+
+### As a library
+
+```rust
+use leakline::{inspect_bytes, Policy, Status};
+
+let verdict = inspect_bytes(&pczt_bytes, Policy::FullPrivacy)?;
+if verdict.status == Status::Leak {
+    // refuse to sign; verdict.codes says why
+}
+```
+
+`inspect_hex` takes hex text instead. A wallet could call this in its finalize path when the proposal cache misses.
+
+## Real testnet examples
+
+`examples/testnet/` has bytes from public testnet (NU6.3, v6, Ironwood): a signed transparent payment, a signed shielded payment, and an unsigned PCZT of each kind. Tx ids and the commands to reproduce them are in [`examples/testnet/README.md`](examples/testnet/README.md). The other files in `examples/` are small synthetic fixtures for the edge cases.
+
+## Ironwood (NU6.3)
+
+Checked against [ZIP 258](https://zips.z.cash/zip-0258) and the `zcash_primitives` 0.31.0-pre.2 changelog: NU6.3 branch id `0x37a5165b`, activation at height 3,428,143 on mainnet and 4,134,000 on testnet, v6 transactions with a separate `valueBalanceIronwood`. Leakline reads that balance through the pinned crate as its own pool. Under ZIP 2006, value can still leave Orchard into Ironwood, but that turnstile publishes the amount, so a migration transaction comes out as `POOL_CROSSING`. That is intended.
 
 ## What it claims
 
@@ -54,8 +108,8 @@ Same bytes, two policies, two exit codes. `examples/transparent-v5.hex` is `LEAK
 - A Merkle witness as metadata. A witness is not `PCZT_METADATA`.
 - ZIP-317 fee anomalies, linked transparent inputs, or a ZIP-321 payment-request match.
 - A constructed or broadcast transaction, or a check that a signature or a proof is valid. A `CLEAN` or `LEAK` byte string can still be rejected by a node.
-- That every file in `examples/` is a parsed, signed transaction. The v5 files and the empty PCZT are structural fixtures. The crossing file uses zero spend-auth and binding signatures. Its Sapling proof is 192 zero bytes, and its Orchard proof is empty. Do not broadcast them. `examples/truncated.hex` is a four-byte header and exits `2`. `examples/unknown-v9.hex` is `UNRECOGNIZED`.
-- A non-empty PCZT built through this crate's public API. The public roles can build an empty Nu6 PCZT. They cannot add inputs or a value sum. The v5 fixtures cover a transparent recipient and the Sapling and Orchard value balances. `REVEALED_SENDER` is covered by the decision table and the policy test, not by a v5 file. See `docs/DESIGN.md`.
+- That every file in `examples/` is a signed transaction. The files in `examples/testnet/` are real testnet bytes; the two PCZTs there are unproven and unsigned. The other files are structural fixtures with zero signatures and proofs. Do not broadcast them. `examples/truncated.hex` is a four-byte header and exits `2`. `examples/unknown-v9.hex` is `UNRECOGNIZED`.
+- `REVEALED_SENDER` from a real file. No testnet example spends a transparent input yet; the code is covered by the decision table and the policy tests.
 
 ## How this differs from nearby tools
 
@@ -72,14 +126,14 @@ cargo test --offline
 echo $?
 ```
 
-`./examples/demo.sh` builds the binary and prints the three classes: a transparent output, a Sapling/Orchard crossing, and an Orchard-only fee candidate. It also shows an unknown version staying `LEAK` under `NoPrivacy`, an empty v5, an empty Nu6 PCZT, and a truncated header exiting `2`.
+`./examples/demo.sh` builds the binary and prints the classes on the synthetic fixtures (a transparent output, a Sapling/Orchard crossing, an Orchard-only fee candidate, an unknown version, an empty v5, an empty Nu6 PCZT), then on the real testnet files, and checks that a truncated header exits `2`.
 
-Pass `--policy` with one of the names above. Omit the file to read stdin. `--help` exits `0`.
+Pass `--policy` with one of the names above. Omit the file to read stdin. `--help` and `--version` exit `0`. CI runs fmt, clippy, the tests and the demo on every push.
 
 The JSON line has `status`, `policy`, `exit`, `codes`, `transparent_input_zatoshis`, `transparent_output_zatoshis`, and the four pool balances in zatoshis.
 
 ## Development
 
-Grok writes the spec and the code. DeepSeek reviews each gate and runs `cargo test` itself. The checker does not call either API. See `AI_USAGE.md` and `hackathon/10-pair-system.md`.
+I used AI tools while building this; Grok wrote most of the code and DeepSeek reviewed each step and ran the tests. The checker does not call any API. See `AI_USAGE.md` and `hackathon/10-pair-system.md`.
 
 License: MIT OR Apache-2.0. See `LICENSE-MIT` and `LICENSE-APACHE`.
