@@ -17,7 +17,7 @@ It fills a gap Zallet itself documents: in zcash/zallet#531, `z_finalizetransact
 - v4/v5/v6 transactions and v5/v6 PCZTs, Sprout/Sapling/Orchard/Ironwood balances
 - Codes: `REVEALED_SENDER`, `REVEALED_RECIPIENT`, `POOL_CROSSING`, `FEE_CANDIDATE`, `PCZT_METADATA`, `UNRECOGNIZED`
 - All seven `zcashd` policies
-- Real testnet fixtures (see `examples/testnet/README.md`), 30 tests + a doctest, CI on every push
+- Real testnet fixtures (see `examples/testnet/README.md`), 30 tests + a doctest
 - Rust library API (`inspect_bytes`, `inspect_hex`) as well as the CLI
 
 ## What it does not claim
@@ -53,8 +53,8 @@ Here's the problem. With PCZTs, the program that builds a Zcash transaction and 
 **2:55, as a gate.** _(show the one-line `leakline ... && sign` example in the README, then the library snippet)_
 "In practice you'd put it right before signing: if Leakline doesn't exit 0, you don't sign. And a wallet like Zallet could call the library function when the cache misses."
 
-**3:20, tests.** _(run `./examples/demo.sh`, then `cargo test`; show the green CI run)_
-"The demo runs every case, including broken input that exits 2 instead of guessing. Tests and CI are green."
+**3:20, tests.** _(run `./examples/demo.sh`, then `cargo test`)_
+"The demo runs every case, including broken input that exits 2 instead of guessing. All the tests pass."
 
 **3:40, limits and close.**
 "What it doesn't do: it's not an anonymity score, it doesn't check signatures or proofs, and it doesn't look at memos or your network. It just answers one question about the bytes you're about to sign. Next I'd like to add redaction checks and get it into a real wallet's finalize path. Thanks for watching."
@@ -62,6 +62,6 @@ Here's the problem. With PCZTs, the program that builds a Zcash transaction and 
 ## Checklist before submitting
 
 - [ ] Make the repo public (it is private now)
-- [ ] CI green on GitHub
+- [ ] Add .github/workflows/ci.yml (needs a token with `workflow` scope) and check it is green
 - [ ] Record and upload the video (own voice), paste the link above
 - [ ] Fill the form on thezecathon.com: track Core & Tooling, repo URL, video URL, description above

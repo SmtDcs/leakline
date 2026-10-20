@@ -128,7 +128,7 @@ echo $?
 
 `./examples/demo.sh` builds the binary and prints the classes on the synthetic fixtures (a transparent output, a Sapling/Orchard crossing, an Orchard-only fee candidate, an unknown version, an empty v5, an empty Nu6 PCZT), then on the real testnet files, and checks that a truncated header exits `2`.
 
-Pass `--policy` with one of the names above. Omit the file to read stdin. `--help` and `--version` exit `0`. CI runs fmt, clippy, the tests and the demo on every push.
+Pass `--policy` with one of the names above. Omit the file to read stdin. `--help` and `--version` exit `0`.
 
 The JSON line has `status`, `policy`, `exit`, `codes`, `transparent_input_zatoshis`, `transparent_output_zatoshis`, and the four pool balances in zatoshis.
 
