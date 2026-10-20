@@ -286,5 +286,7 @@ Biri seçilecek. İkisi birden teslim edilemez.
 Kullanıcı Leakline, Sidefee veya Quiet Quote seçer. Dördüncü ve beşinci aday da açık. Seçimden önce iskelet, sözleşme ve deploy yok.
 
 ```text
-Decision: pending user choice
+Decision: Leakline
 ```
+
+Kullanıcı 2026-10-20'de Leakline'ı seçti. Süre, kapsamı kısma gerekçesi değil. Etkinlik yine 2026-10-28 23:59 UTC'de kapanıyor. Kurulacak hali, incelemelerin istediği tam kontrol: başkasının kurduğu işlemin baytları, havuzlar arası açık bakiye, `zcashd` politika adları, PCZT. Sidefee, Quiet Quote, Sealed Lot ve Till kapalı.

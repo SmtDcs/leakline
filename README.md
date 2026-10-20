@@ -1,6 +1,6 @@
 # ZECATHON 2026
 
-zkSNARKs Zcash gizlilik hackathonu. Araştırma duruyor. Fikir seçilmedi, kod yok.
+zkSNARKs Zcash gizlilik hackathonu. Seçilen fikir Leakline: yayınlanmamış işlemin tutarı açıkta mı, ona bakan araç. Kod henüz yok.
 
 - Teslim: 28 Ekim 2026, 23:59 UTC
 - Brief: `hackathon/00-brief.md`
