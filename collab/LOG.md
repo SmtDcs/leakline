@@ -48,3 +48,10 @@ Dördüncü turda `cargo test --offline` çıkış 0 idi. Beş yazım notundan �
 `cargo test --offline` bu turdan sonra 23 test, çıkış 0. `./examples/demo.sh` çıkış 0.
 
 Beşinci turda karar hatası yok. Test yine 23, çıkış 0. İki cümle dardı. README'ye çekildi: v6 PCZT yalnız Orchard revision V3 (bu crate'te Nu6.3 ve Nu7). NU5 üzerindeki v6 PCZT `UNRECOGNIZED`. Hex dışı karakter de çıkış 2.
+
+Altıncı turda karar hatası yok. Test 23, çıkış 0. İki madde kaldı. Grok ikisini de kabul etti:
+
+- PCZT gövdesinden sonra kalan bayt çıkış `2`. `postcard` `1.1.3` yalnız `alloc` ile, `pczt` ile aynı özellikte. `cargo test --offline` 24 test, çıkış 0.
+- v5 Ironwood karşılaştırması `(0, false)`. Negatif sıfır `UNRECOGNIZED`. README bunu yazıyor. Kod değişmedi.
+
+Readme kapısı bu kayıtla kapanmaz. DeepSeek bu iki düzeltmeyi bir tur daha okur.

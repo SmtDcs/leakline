@@ -85,6 +85,7 @@ fn inspect_transaction(bytes: &[u8], policy: Policy) -> Result<Verdict, String> 
 
 fn inspect_pczt(bytes: &[u8], policy: Policy) -> Result<Verdict, String> {
     let pczt = pczt::parse(bytes).map_err(|err| format!("unreadable pczt: {err}"))?;
+    reject_pczt_trailing(bytes)?;
     if !pczt_supported(&pczt) {
         let mut exposure = Exposure::empty_shielded();
         exposure.recognized = false;
@@ -162,6 +163,25 @@ fn pczt_supported(pczt: &pczt::Pczt) -> bool {
         _ => false,
     };
     version_ok
+}
+
+/// `pczt::parse` stops at the end of the postcard body and ignores bytes after it.
+fn reject_pczt_trailing(bytes: &[u8]) -> Result<(), String> {
+    if bytes.len() < 8 {
+        return Ok(());
+    }
+    let version = u32::from_le_bytes(bytes[4..8].try_into().expect("pczt version"));
+    let body = &bytes[8..];
+    let rest = match version {
+        1 => postcard::take_from_bytes::<pczt::v1::Pczt>(body).map(|(_, rest)| rest),
+        2 => postcard::take_from_bytes::<pczt::v2::Pczt>(body).map(|(_, rest)| rest),
+        _ => return Ok(()),
+    };
+    match rest {
+        Ok(rest) if rest.is_empty() => Ok(()),
+        Ok(_) => Err("trailing bytes after pczt".into()),
+        Err(_) => Ok(()),
+    }
 }
 
 fn ironwood_empty(bundle: &pczt::orchard::Bundle) -> bool {
@@ -348,6 +368,14 @@ mod tests {
         assert_eq!(opened.status, Status::Clean);
         assert_eq!(opened.exit_code, 0);
         assert_eq!(opened.codes, vec![Code::PoolCrossing]);
+    }
+
+    #[test]
+    fn trailing_pczt_bytes_are_a_usage_error() {
+        let mut bytes = empty_nu6_pczt();
+        bytes.push(0x00);
+        let err = inspect_bytes(&bytes, Policy::FullPrivacy).unwrap_err();
+        assert!(err.contains("trailing"), "{err}");
     }
 
     #[test]

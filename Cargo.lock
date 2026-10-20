@@ -684,6 +684,7 @@ dependencies = [
  "jubjub",
  "pasta_curves",
  "pczt",
+ "postcard",
  "redjubjub",
  "zcash_primitives",
  "zcash_protocol",
