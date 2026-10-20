@@ -20,7 +20,7 @@ En fazla üç, ve yalnızca süre yettiği için:
 2. Shielded Payments. Yalnızca tek not, tek alıcı, tek memo. FROST ve çoklu bordro yok.
 3. Private Markets. Yalnızca iki kişilik teklif. Emir defteri ve ihale motoru yok.
 
-Cross-Chain bu sürede seçilmez. Track metni "yolda unshield etmeden" diyor. THORChain'in ZEC entegrasyonu yalnızca transparent UTXO. Zashi CrossPay (şimdi ZODL) shielded ZEC'ten NEAR destekli bir varlığa ödüyor; bu cüzdanın içinde. Merchant linkine taşımak ikinci bir protokol ve likidite istiyor. 8 günde sızıntısız bir köprü iddiası, jürinin eleme cümlesine çarpma riski taşır.
+Cross-Chain bu sürede seçilmez. Track metni "yolda unshield etmeden" diyor. THORChain'in ZEC entegrasyonu yalnızca transparent UTXO. Zashi CrossPay (şimdi ZODL) shielded ZEC'ten NEAR destekli bir varlığa ödüyor; bu cüzdanın içinde. 8 Eylül 2026'da bir kullanıcı, Zodl içinden NEAR Intents'e çıkan 1.120 shielded ZEC karşılığı USDT'nin 50 gündür tutulduğunu yazdı. 15 Eylül'de forum, cevabın daha büyük bir köprü olmadığını yazdı. Bu track'e girmek o arızanın üstüne ikinci bir çıkış kapısı eklemek olur.
 
 Wildcard seçilmez. $5.000 Zero to ZEC bounty ödendi. Kalan $15.000'lık track açık, fakat "beklemediğimiz bir şey" ölçütü çalışan bir ödeme veya araçdan daha zayıf duruyor.
 

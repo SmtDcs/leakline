@@ -11,6 +11,22 @@ Araştırma tarihi: 20 Ekim 2026.
 - Zcash'te sözleşme yok. Demo bir shielded not, bir memo veya bir işlemin public alanları üzerinde durur.
 - Elenen hazır kalıplar: Zink fatura masası, ZecVault / Konclave / CYZE emanet, Glasspane ifşası, Zaygent trading botu, ZIP-321 ön kontrol, ZecBlock explorer puanı.
 
+## Problem defteri
+
+Arama: 20 Ekim 2026. Forum `forum.zcashcommunity.com`, X, açık grant konuları. Fiyat ve delist şikayetleri yazılmadı.
+
+| Şikayet | Link | Durum | Karşılayan |
+|---|---|---|---|
+| Shielded ZEC, Zodl içinden NEAR Intents'e çıkınca ~$589k USDT 50 gündür tutuluyor. Cüzdan takası, havuzdan çıkışı gizlemiş | [timtech, 8 Eylül 2026](https://forum.zcashcommunity.com/t/my-experience-exiting-shielded-zec-from-zodl-to-near-intents-589k-usdt-still-held-50-days-despite-a-written-compliance-clearance/57497) | Kapsam dışı: başkasının parasını kurtarmak ve yeni bir köprü kurmak. Yapılacak parça, çıkıştan önce neyin public olacağını söylemek | Leakline |
+| "Radically honest UI": takas tuşu, havuzdan çıkıldığını ve karşı tarafın dondurabileceğini göstermek zorunda | [ZecMec, 15 Eylül 2026](https://forum.zcashcommunity.com/t/the-bridge-is-a-trap-why-timtech-s-50-day-freeze-proves-we-must-close-the-shielded-loop/57616) | Açık. Protokol işi (shielded stablecoin) bu pencerenin dışında. Uyarı ve merchant aracı istenmiş | Leakline, Sidefee |
+| "DeFi için unshield mi etmek zorundayım? Shielded ZEC'i para gibi harcayamıyor muyum?" | [@DeFi_Dad, 1 Ekim 2026](https://x.com/DeFi_Dad/status/2105719600436445489) | Açık. Cevap yeni bir DEX değil. Havuzda kalan bir ödeme, ya da çıkışın public olduğunu söyleyen bir kapı | Sidefee, Leakline |
+| Testnet faucet yanlış zincire ödüyor. Fauzec damlaları NU7 öncesi zincire iniyor, cüzdan görmüyor. jinolabs NU7 için durmuş. Türkiye mini hackathonunda ekipler TAZ bulamamış | [16 Ağustos 2026](https://forum.zcashcommunity.com/t/we-need-support-with-a-testnet-zec-faucet/57087) | Açık, tek başına $15K iş değil. Leakline'a ikinci kontrol olarak eklenebilir: bu tx güncel testnet dalında mı | Leakline, isteğe bağlı |
+| WebZjs, NU7 testnet'te senkron olmuyor. Başka bir katılımcı bunu ZECATHON Core track'ine yazıyor | [NU7 timeline, Ekim 2026](https://forum.zcashcommunity.com/t/nu7-timeline/57655) | Alınmış. Paul, WebZjs portunu kendi teslimi olarak yazmış | Yapılmayacak |
+| Marketplace için shielded checkout, UFVK, webhook, iade. Kod henüz yok, grant filtrelenmiş | [ZEC Order Pay, 13 Ekim 2026](https://forum.zcashcommunity.com/t/grant-application-zec-order-pay-shielded-zec-checkout-refunds-and-creator-payouts-for-service-marketplaces/58168) | Zink aynı döngüyü kurmuş. Aynı kasayı yazmak repackage sayılır | Yapılmayacak |
+| `zcash-devtool inspect` işlemi ve havuzları çözüyor | [zcash/zcash-devtool](https://github.com/zcash/zcash-devtool) | Var. Leakline'ın farkı debug dökümü değil, `CLEAN` / `LEAK` ve çıkış kodu | Leakline farkını daraltır, fikri düşürmez |
+
+Quiet Quote ve Sealed Lot bu turda bir şikayete bağlanmadı. Mekanizma olarak duruyorlar. 0.2 içindeki bir fikir, alıntılanmış şikayeti olanın ardına düşer.
+
 ## Aday 1 — Leakline
 
 Core & Tooling.
@@ -28,6 +44,8 @@ Kullanıcı ve an: Cüzdan veya ödeme entegrasyonu yazan geliştirici, işlemi 
 5. Aynı hex bir explorer'da açılır. Aracın "public" dediği alan orada görünür, `CLEAN` işlemde tutar görünmez.
 
 Zincirde yeni işlem şart değil. Doğrulama, kazınmış bir mainnet tx ve bizim ürettiğimiz bir testnet tx ile yapılır. Harcama anahtarı araca girmez.
+
+Şikayet: ZecMec'in istediği çıkış uyarısı ve DeFi Dad'in "bunu harcamak için unshield mi edeceğim" sorusu. Araç, cüzdanın basacağı cümleyi üretir: bu işlem havuzdan çıkıyor, şu alan public.
 
 Track: Core & Tooling cümlesi birebir bu. "SDKs, explorers, testing tools."
 
@@ -77,6 +95,8 @@ Kullanıcı ve an: Freelance işi ZEC ile ödeyen biri. Platform komisyonu istiy
 
 Zincir: Zcash testnet. Sözleşme yok. Kanıt, iki nottan yalnız birinin açılmasıdır.
 
+Şikayet: ZecMec, grant parasının merchant aracına ve havuzdan çıkmadan kesilen faturaya gitmesini istiyor. DeFi Dad, shielded ZEC ile ödeme bulamadığını yazıyor. ZEC Order Pay aynı kasayı istiyor ve kodu yok. Zink tek alıcıyı çözdüğü için Sidefee yalnız iki notalı ayrımı yapar.
+
 Track: Shielded Payments. Checkout ve fatura örneklerinin içindedir.
 
 Demo: Platform paneli "komisyon geldi, 0.01". Müşteri bakiyesi arttı. Explorer boş. 70 saniye.
@@ -121,6 +141,8 @@ Kullanıcı ve an: İki kişi ZEC karşılığı bir şey için OTC konuşuyor. 
 4. Alıcı tam o tutarda ikinci bir shielded ödeme yapar. Memo teklif kimliğini taşır.
 5. Satıcı ekranı "doldu" der. Yanlış tutar eşleşmez ve fiyat açıklanmaz.
 
+Şikayet: bu turda eşleşen bir şikayet yok. Track metni yine de kapalı teklif istiyor.
+
 Track metni: "fiyat kamuya, taraflar değil." Burada fiyat, işlem bitince bile kamu değildir. Satıcı isterse fiyatı sonradan söyler. Zincir söyleyemez.
 
 Demo: İki cüzdan, bir sayfa, explorer'da iki shielded tx. 80 saniye.
@@ -158,6 +180,8 @@ Private Markets.
 Bir cümle: Bir açık artırmada kaybeden tekliflerin tutarı shielded notanın içinde kalır ve tur bitince de açılmaz.
 
 Kullanıcı ve an: Bir bağış veya lot için teklif veren kişi. Commit-reveal turunda kaybedenler de fiyatını yayınlamak zorunda kalır.
+
+Şikayet: bu turda eşleşen bir şikayet yok.
 
 Çekirdek döngü: satış ilanı public açıklama taşır, teklifler ihale adresine encrypted memo olarak gider, ihale sahibi yerelde açar, sayfa yalnız kazanan fiyatı yazar, kaybeden tutar hiçbir exportta yoktur. Uzlaşma, kazananın ödediği shielded tx'tir. Emanet sözleşmesi yok.
 
@@ -205,9 +229,11 @@ Kullanıcı ve an: ZEC tutan biri, USDC isteyen bir satıcıya ödeyecek. Bugün
 | Zaygent | https://github.com/ZecHub/zechub/tree/main/Hackathon/2026/zaygent | CrossPay ile trading agent | Merchant faturası değil |
 | THORChain ZEC | https://crypto-economy.com/thorchain-completes-zec-integration/ | Native ZEC takası | Transparent. Track'in "unshield etmeden" cümlesini karşılamaz |
 
+Şikayet: timtech vakası bu ürünün sınıfını tarif ediyor. Shielded ZEC bir intent çözücüsüne çıkınca 1.120 ZEC karşılığı USDT 50 gün tutulmuş. Forumun istediği şey daha iyi bir çıkış yolu değil. Till bu şikayeti büyütür.
+
 Ayırıcı cümle: CrossPay cüzdanın içinde biter. Till, satıcının paylaştığı faturayı o akışa bağlar ve ZEC adresini satıcıya göstermez.
 
-Bu, 8 günde ikinci ağ, intent API ve likidite istediği için kısa listede değil. Deep link'in public olup olmadığı UNVERIFIED. Yarı shielded bir köprü, privacy ölçütünde elenebilir.
+Kısa listeden indi. Süre yetmez. Ayrıca community'nin yazdığı arıza tam bu kapı: havuzdan çıkınca dondurma karşı tarafta. Deep link UNVERIFIED.
 
 ### Puan
 
@@ -235,19 +261,25 @@ Bu, 8 günde ikinci ağ, intent API ve likidite istediği için kısa listede de
 
 ## Kısa liste
 
-1. Leakline. Araç. Yayın öncesi gizlilik kapısı.
-2. Sidefee. Ürün. Platform komisyonu, müşteri tutarı gizli.
-3. Quiet Quote. Ürün. Fiyat memo'da kalır, dolum normal bir shielded ödemedir.
+1. Leakline. Araç. Havuzdan çıkışı yayınlanmadan söyler. Forumun "dürüst uyarı" maddesine oturur.
+2. Sidefee. Ürün. Ödeme havuzda kalır. Forumun merchant aracı maddesine oturur.
+3. Quiet Quote. Ürün. Bu turda bir şikayete bağlanmadı. Track metni için duruyor.
+
+Till kısa listeden indi.
 
 ## Öneri
 
 Leakline.
 
-Sekiz gün ve tek kişi varsayımıyla çekirdek döngü faucet, lightwalletd ve Halo2 proof beklemiyor. Yine de gerçek işlemlere bakıyor. Jürinin ilk ölçütü "sızıntı eler". Track'in kendi cümlesi "sonraki geliştiricinin teşekkür edeceği araç." Grand prize için zayıf kalan yer kullanım hikâyesi: bu bir cüzdan değil, bir kapı. Pazartesi kullanan kişi Zcash entegrasyonu yazan geliştirici.
+Şikayet turu bunu güçlendirdi. 8 Eylül ve 15 Eylül forum yazıları, cüzdanın havuzdan çıkışı sessizce yaptığını ve karşı tarafın parayı tutabildiğini anlatıyor. 1 Ekim'de aynı soru X'te sorulmuş. Leakline o çıkışı bir işlemde adlandırır ve CI'ı kırar. Sekiz günde faucet ve Halo2 beklemez.
 
-Sidefee daha iyi bir ürün hikâyesi. Yapılabilirlik 3.2, çünkü çok çıktılı shielded işlem bu ekip için yeni. Quiet Quote track metnine en yakın pazar işi. İki cüzdan senkronu aynı riski taşıyor.
+Sidefee, "köprüyü büyütme, havuzda öde" cümlesinin ürün hali. ZEC Order Pay aynı kasayı grant'e yazmış, kodu yok. Zink tek alıcıyı yaptığı için Sidefee yalnızca platform notası ile müşteri notasını ayırırsa yeni kalır. Yapılabilirlik 3.2.
 
-Üçü de birbirinin parçası değil. Biri seçilecek. İkisi birden teslim edilemez.
+Quiet Quote mekanik olarak duruyor. Bu aramada onu isteyen bir kişi çıkmadı. Markets track'i bilerek seçilirse o aday açılır.
+
+Başkasının dondurulmuş USDT'sini çözmek, NU7 WebZjs portu ve shielded stablecoin bu pencerenin işi değil. Birincisi başkasının parası. İkincisini başka bir katılımcı yazıyor. Üçüncüsü protokol.
+
+Biri seçilecek. İkisi birden teslim edilemez.
 
 ## Karar
 
