@@ -217,8 +217,7 @@ mod tests {
         bytes
     }
 
-    #[test]
-    fn transparent_v5_output_is_leak() {
+    fn transparent_v5() -> Vec<u8> {
         let mut bytes = v5_header();
         bytes.push(0x00);
         bytes.push(0x01);
@@ -227,6 +226,40 @@ mod tests {
         bytes.push(0x00);
         bytes.push(0x00);
         bytes.push(0x00);
+        bytes
+    }
+
+    fn empty_v5() -> Vec<u8> {
+        let mut bytes = v5_header();
+        bytes.extend_from_slice(&[0x00, 0x00, 0x00, 0x00, 0x00]);
+        bytes
+    }
+
+    fn unknown_v9() -> Vec<u8> {
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&0x8000_0009u32.to_le_bytes());
+        bytes.extend_from_slice(&1u32.to_le_bytes());
+        bytes
+    }
+
+    fn empty_nu6_pczt() -> Vec<u8> {
+        pczt::roles::creator::Creator::new(
+            u32::from(BranchId::Nu6),
+            0,
+            133,
+            Some([0; 32]),
+            Some([0; 32]),
+        )
+        .expect("creator")
+        .build()
+        .expect("build")
+        .serialize()
+        .expect("serialize")
+    }
+
+    #[test]
+    fn transparent_v5_output_is_leak() {
+        let bytes = transparent_v5();
         let verdict = inspect_bytes(&bytes, Policy::FullPrivacy).unwrap();
         assert_eq!(verdict.status, Status::Leak);
         assert_eq!(verdict.exit_code, 1);
@@ -241,8 +274,7 @@ mod tests {
 
     #[test]
     fn empty_v5_is_clean() {
-        let mut bytes = v5_header();
-        bytes.extend_from_slice(&[0x00, 0x00, 0x00, 0x00, 0x00]);
+        let bytes = empty_v5();
         let verdict = inspect_bytes(&bytes, Policy::FullPrivacy).unwrap();
         assert_eq!(verdict.status, Status::Clean);
         assert!(verdict.codes.is_empty());
@@ -250,9 +282,7 @@ mod tests {
 
     #[test]
     fn unknown_version_is_leak() {
-        let mut bytes = Vec::new();
-        bytes.extend_from_slice(&0x8000_0009u32.to_le_bytes());
-        bytes.extend_from_slice(&1u32.to_le_bytes());
+        let bytes = unknown_v9();
         let verdict = inspect_bytes(&bytes, Policy::NoPrivacy).unwrap();
         assert_eq!(verdict.status, Status::Leak);
         assert_eq!(verdict.codes, vec![Code::Unrecognized]);
@@ -310,20 +340,52 @@ mod tests {
 
     #[test]
     fn empty_nu6_pczt_is_clean() {
-        let pczt = pczt::roles::creator::Creator::new(
-            u32::from(BranchId::Nu6),
-            0,
-            133,
-            Some([0; 32]),
-            Some([0; 32]),
-        )
-        .expect("creator")
-        .build()
-        .expect("build")
-        .serialize()
-        .expect("serialize");
-        let verdict = inspect_bytes(&pczt, Policy::FullPrivacy).unwrap();
+        let verdict = inspect_bytes(&empty_nu6_pczt(), Policy::FullPrivacy).unwrap();
         assert_eq!(verdict.status, Status::Clean);
+    }
+
+    #[test]
+    fn orchard_fee_bytes_are_clean() {
+        let verdict = inspect_bytes(&orchard_fee_v5(), Policy::FullPrivacy).unwrap();
+        assert_eq!(verdict.status, Status::Clean);
+        assert_eq!(verdict.exit_code, 0);
+        assert_eq!(verdict.codes, vec![Code::FeeCandidate]);
+        assert_eq!(verdict.orchard_zatoshis, -10_000);
+        assert_eq!(verdict.sapling_zatoshis, 0);
+    }
+
+    /// The hex files under `examples/` are the demo. They must stay equal to these builders.
+    #[test]
+    fn demo_files_match_the_builders() {
+        expect_example("transparent-v5.hex", &transparent_v5());
+        expect_example("crossing-v5.hex", &crossing_v5());
+        expect_example("orchard-fee-v5.hex", &orchard_fee_v5());
+        expect_example("empty-v5.hex", &empty_v5());
+        expect_example("unknown-v9.hex", &unknown_v9());
+        expect_example("empty-nu6.pczt.hex", &empty_nu6_pczt());
+
+        let crossing = inspect_bytes(&read_example("crossing-v5.hex"), Policy::FullPrivacy).unwrap();
+        assert_eq!(crossing.status, Status::Leak);
+        assert_eq!(crossing.codes, vec![Code::PoolCrossing]);
+        let opened =
+            inspect_bytes(&read_example("crossing-v5.hex"), Policy::AllowRevealedAmounts).unwrap();
+        assert_eq!(opened.status, Status::Clean);
+    }
+
+    fn expect_example(name: &str, bytes: &[u8]) {
+        assert_eq!(read_example(name), bytes, "{name} drifted from the builder");
+    }
+
+    fn read_example(name: &str) -> Vec<u8> {
+        let text = std::fs::read_to_string(example_path(name)).expect(name);
+        let cleaned: String = text.chars().filter(|ch| ch.is_ascii_hexdigit()).collect();
+        hex::decode(cleaned).expect(name)
+    }
+
+    fn example_path(name: &str) -> std::path::PathBuf {
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("examples")
+            .join(name)
     }
 
     fn crossing_v5() -> Vec<u8> {
@@ -355,6 +417,29 @@ mod tests {
         bytes.extend_from_slice(&[0; 80]);
         bytes.push(0x03);
         bytes.extend_from_slice(&(-4_9900_0000i64).to_le_bytes());
+        bytes.extend_from_slice(&[0; 32]);
+        bytes.push(0x00);
+        bytes.extend_from_slice(&[0; 64]);
+        bytes.extend_from_slice(&[0; 64]);
+        bytes
+    }
+
+    fn orchard_fee_v5() -> Vec<u8> {
+        use group::{Group, GroupEncoding};
+        let pallas = pasta_curves::pallas::Point::generator().to_bytes();
+        let mut bytes = v5_header();
+        bytes.extend_from_slice(&[0x00, 0x00]);
+        bytes.extend_from_slice(&[0x00, 0x00]);
+        bytes.push(0x01);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&[0; 32]);
+        bytes.extend_from_slice(&pallas);
+        bytes.extend_from_slice(&[0; 580]);
+        bytes.extend_from_slice(&[0; 80]);
+        bytes.push(0x03);
+        bytes.extend_from_slice(&(-10_000i64).to_le_bytes());
         bytes.extend_from_slice(&[0; 32]);
         bytes.push(0x00);
         bytes.extend_from_slice(&[0; 64]);

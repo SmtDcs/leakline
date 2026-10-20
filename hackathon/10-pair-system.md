@@ -33,7 +33,7 @@ Workflow: `.grok/workflows/leakline-gate.rhai`. Çalıştırma: `gate` değeri `
 | parse | Kilitli crate ile v5 hex açılıyor. Tanınmayan sürüm `LEAK` / `UNRECOGNIZED`. |
 | policy | Üç sınıf: transparent çıkış, Sapling↔Orchard geçişi, tek havuz. Aynı bayt iki politikada iki çıkış kodu. |
 | pczt | PCZT okunuyor. Ham işlemde para üstü tahmini yok. Metadata uyarı, yükleme yok. |
-| readme | `cargo test` yeşil. README iddiayı ve iddia dışı kalanı yazıyor. |
+| readme | `cargo test` yeşil. README iddiayı ve iddia dışı kalanı yazıyor. `examples/demo.sh` üç sınıfı yerelde basar. |
 
 Demo ve video kapı 5, form kapı 6. İkisi de bu döngünün dışında, ürün testleri yeşil olduktan sonra.
 

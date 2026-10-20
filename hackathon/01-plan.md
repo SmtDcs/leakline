@@ -79,10 +79,10 @@ Teslim 2026-10-28 23:59 UTC. Sıra önem sırasıdır, saat kotası değil.
 
 ## Definition of done
 
-- [ ] `cargo test` üç sınıf örneği doğru etiketler
-- [ ] `LEAK` çıkış kodu 1
-- [ ] Anahtar istenmez, ağ çağrısı yapılmaz
-- [ ] README neyin iddia edildiğini ve edilmediğini söyler
+- [x] `cargo test` üç sınıf örneği doğru etiketler
+- [x] `LEAK` çıkış kodu 1
+- [x] Anahtar istenmez, ağ çağrısı yapılmaz
+- [x] README neyin iddia edildiğini ve edilmediğini söyler
 - [ ] İki dakikalık video
 - [ ] Teslim formu
-- [ ] Deck yok
+- [x] Deck yok

@@ -25,7 +25,13 @@ fn run() -> Result<u8, String> {
             }
             "--help" | "-h" => {
                 println!(
-                    "leakline [--policy FullPrivacy] [file]\nReads a hex transaction. Prints JSON. Exit 0 CLEAN, 1 LEAK, 2 usage."
+                    "\
+leakline [--policy NAME] [file]
+Reads hex from a file, or from stdin when no file is given. Prints one JSON line.
+Exit 0 CLEAN, 1 LEAK, 2 usage or unreadable input.
+NAME is a zcashd policy. The default is FullPrivacy.
+FullPrivacy AllowRevealedAmounts AllowRevealedRecipients AllowRevealedSenders
+AllowFullyTransparent AllowLinkingAccountAddresses NoPrivacy"
                 );
                 return Ok(0);
             }

@@ -17,7 +17,7 @@ flowchart LR
 | Component | Responsibility | Chain |
 |---|---|---|
 | `leakline-core` | Baytları çözümler, politika uygular, kod üretir | Yok. Yerel |
-| `leakline` CLI | Dosya okur, metin ve `--json` basar | Yok |
+| `leakline` CLI | Dosya veya stdin okur, tek satır JSON basar | Yok |
 | `fixtures/` | Kazınmış işlemler ve beklenen kararlar | Zcash mainnet veya testnet, sadece okuma |
 | Demo sayfası | Aynı kütüphaneyi tarayıcıda, veya CLI kaydı | Ağ çağrısı yok |
 
