@@ -25,3 +25,8 @@ DeepSeek testi kendisi çalıştırdı: `cargo test --offline` çıkış 0, 22 t
 - Çıkış 2 JSON basmaz. Hata stderr'e gider.
 - `examples/` içindeki her dosya ayrışmaz. `truncated.hex` çıkış 2, `unknown-v9.hex` `UNRECOGNIZED`.
 - v5 örnekleri imzalı değildir. İmza doğrulanmaz. Bu dosyalar alıcıyı ve havuz bakiyesini taşır. `REVEALED_SENDER` v5 dosyasında değil, karar tablosunda ve politika testindedir.
+
+İkinci turda karar hatası yine yok. `cargo test --offline` çıkış 0, 22 test. İki yazım farkı kaldı. Kod değişmedi; README koda çekildi:
+
+- `pczt::parse` hatası çıkış 2'dir. `UNRECOGNIZED`, PCZT ayrıştıktan sonra destek kontrolü başarısızsa konur.
+- v4, v5 ve v6 cümlesi ham işlem içindir. PCZT yalnız desteklenen v5 (boş Ironwood) veya v6'dır. v4 PCZT `UNRECOGNIZED` kalır.

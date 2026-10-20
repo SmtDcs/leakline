@@ -10,7 +10,11 @@ Track: ZECATHON Core & Tooling. Deadline: 2026-10-28 23:59 UTC.
 
 The input is hex of a PCZT (the bytes start with the ASCII magic `PCZT`) or of a serialized v4, v5, or v6 transaction. Signatures and proofs are not checked. The parser is `zcash_primitives` `0.31.0-pre.2` and `pczt` `0.10.0-pre.2`. Circuit, prover, and tx-extractor features are off. There is no hand-written bundle parser.
 
-Recognized transaction versions are v4, v5, and v6. A version outside that set, or a bundle the library rejects for a reason other than running out of bytes, is `LEAK` with code `UNRECOGNIZED`. That stays `LEAK` under every policy, including `NoPrivacy`. Empty input, odd-length hex, and a read that stops early (`UnexpectedEof`, including a truncated header) are not a verdict: exit `2`.
+A serialized transaction is recognized when its version is v4, v5, or v6. Any other version, or a bundle the transaction parser rejects for a reason other than running out of bytes, is `LEAK` with code `UNRECOGNIZED`. That stays `LEAK` under every policy, including `NoPrivacy`.
+
+A PCZT is recognized only as v5 with an empty Ironwood bundle, or as v6 on Orchard protocol revision V3 or later, with a consensus branch of NU5 or newer. In this crate, revision V3 is Nu6.3 and Nu7. A parsed v4 PCZT, a v5 PCZT that carries Ironwood actions or a non-zero Ironwood value sum, and any other parsed PCZT outside that pair, are `LEAK` / `UNRECOGNIZED`. If `pczt::parse` itself fails, including a missing field inside a bundle, that is unreadable input: exit `2`, not a verdict.
+
+Empty input, odd-length hex, a transaction read that stops early (`UnexpectedEof`, including a truncated header), and a PCZT that does not parse are exit `2`.
 
 | Code | When it is reported | Amount in the JSON |
 |---|---|---|
@@ -19,7 +23,7 @@ Recognized transaction versions are v4, v5, and v6. A version outside that set, 
 | `POOL_CROSSING` | Two or more of Sprout, Sapling, Orchard, and Ironwood have a non-zero value balance | Those balances |
 | `FEE_CANDIDATE` | Exactly one pool balance is non-zero and there is no transparent input or output | Info only. Does not make the verdict `LEAK` |
 | `PCZT_METADATA` | A public PCZT field carries `proprietary`, `user_address`, or `dummy_sk` | Warning only. Does not make the verdict `LEAK` |
-| `UNRECOGNIZED` | Version is not v4, v5, or v6, or the library rejects the bundle | No invented amounts |
+| `UNRECOGNIZED` | A parsed transaction is not v4, v5, or v6, or its bundle is rejected. A parsed PCZT is not the supported v5 or v6 described above | No invented amounts |
 
 A fee-sized second pool is still `POOL_CROSSING`. No transparent parts does not make a two-pool transaction `CLEAN`. Sprout joinsplit value balance and the v6 Ironwood bundle are pools. Ironwood is read by the pinned crate. Leakline does not ship a second Ironwood parser.
 
