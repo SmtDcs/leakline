@@ -73,6 +73,10 @@ Teslim 2026-10-28 23:59 UTC. Sıra önem sırasıdır, saat kotası değil.
 | Ham işlemde girdi tutarı yazmaz | kesin | Tutar yalnız PCZT'de ya da bakiye işaretinden yazılır |
 | Jüri ShieldLint ile karıştırır | orta | README ilk ekranda: o kaynak metnine bakar, bu yayınlanacak bayta bakar |
 
+## Çift model
+
+İşletim sistemi `hackathon/10-pair-system.md`. Karar tablosunun tek kopyası odur. Grok kodlar. DeepSeek her kapıda spec'i okur ve testi kendisi çalıştırır. Workflow: `.grok/workflows/leakline-gate.rhai`.
+
 ## Definition of done
 
 - [ ] `cargo test` üç sınıf örneği doğru etiketler

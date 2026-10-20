@@ -1,9 +1,9 @@
 # AI Usage
 
 - Tool: Grok Build
-- Models:
-- Scope: scaffold, tests, UI components, documentation
-- Human direction: architecture, contract design, code review, deployment
+- Models: Grok orchestrates. DeepSeek (`deepseek-flash`) reviews each gate and runs the tests. The product does not call either API.
+- Scope: spec, Rust checker, tests, documentation
+- Human direction: idea choice, architecture lock, accept or reject a gate
 - Files or commits tagged `ai-assisted`:
 - Verification: tests run, manual review, testnet deploy
 

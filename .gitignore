@@ -23,6 +23,12 @@ coverage/
 .idea/
 .vscode/
 
+# rust
+target/
+
+# pair logs may contain command output; never put keys here
+collab/*.log
+
 # recordings
 *.mp4
 *.mov

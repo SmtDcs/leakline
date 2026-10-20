@@ -7,4 +7,4 @@ zkSNARKs Zcash gizlilik hackathonu. Seçilen fikir Leakline: yayınlanmamış i�
 - Track matrisi: `hackathon/04-sponsors.md`
 - Fikirler: `hackathon/02-idea.md`
 
-Karar satırı: `Decision: pending user choice`.
+Karar: Leakline. İşletim: `hackathon/10-pair-system.md`. Çekirdek `src/` altında. `cargo test` karar tablosunu ve bir v5 transparent örneği geçiyor.
