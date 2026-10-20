@@ -46,3 +46,5 @@ Dördüncü turda `cargo test --offline` çıkış 0 idi. Beş yazım notundan �
 - Crossing fixture'da Sapling kanıtı 192 sıfır bayttır. Orchard kanıtı boştur.
 
 `cargo test --offline` bu turdan sonra 23 test, çıkış 0. `./examples/demo.sh` çıkış 0.
+
+Beşinci turda karar hatası yok. Test yine 23, çıkış 0. İki cümle dardı. README'ye çekildi: v6 PCZT yalnız Orchard revision V3 (bu crate'te Nu6.3 ve Nu7). NU5 üzerindeki v6 PCZT `UNRECOGNIZED`. Hex dışı karakter de çıkış 2.

@@ -12,9 +12,9 @@ The input is hex of a PCZT (the bytes start with the ASCII magic `PCZT`) or of a
 
 A serialized transaction is recognized when its version is v4, v5, or v6 and the parser consumes every byte. Any other version is `LEAK` with code `UNRECOGNIZED`. The same code is used when the version is readable but `Transaction::read` rejects the bytes for a reason other than running out of input. An unknown consensus branch id is that case. `UNRECOGNIZED` stays `LEAK` under every policy, including `NoPrivacy`. Bytes left over after a successful parse are not a verdict: exit `2`.
 
-A PCZT is recognized only as v5 with no Ironwood actions and an Ironwood value sum of zero, or as v6 on Orchard protocol revision V3 or later, with a consensus branch of NU5 or newer. In this crate, revision V3 is Nu6.3 and Nu7. Other Ironwood fields, such as an anchor or a proof, are not part of this check. A parsed v4 PCZT, a v5 PCZT outside that Ironwood rule, and any other parsed PCZT outside that pair, are `LEAK` / `UNRECOGNIZED`. If `pczt::parse` itself fails, including a missing field inside a bundle, the container was not decoded: exit `2`, not a verdict.
+A PCZT is recognized in two cases. A v5 PCZT needs a consensus branch of NU5 or newer, no Ironwood actions, and an Ironwood value sum of zero. A v6 PCZT needs Orchard protocol revision V3 or later. In this crate that revision is Nu6.3 and Nu7, so a v6 PCZT on NU5, Nu6, Nu6.1, or Nu6.2 is `UNRECOGNIZED`. Other Ironwood fields, such as an anchor or a proof, are not part of the v5 check. A parsed v4 PCZT, and any other parsed PCZT outside those two cases, is `LEAK` / `UNRECOGNIZED`. If `pczt::parse` itself fails, including a missing field inside a bundle, the container was not decoded: exit `2`, not a verdict.
 
-Empty input, odd-length hex, a transaction read that stops early (`UnexpectedEof`, including a truncated header), bytes left after a transaction, and a PCZT that does not parse are exit `2`.
+Empty input, an odd number of hex digits, a character other than a hex digit, whitespace, or `x`, a transaction read that stops early (`UnexpectedEof`, including a truncated header), bytes left after a transaction, and a PCZT that does not parse are exit `2`.
 
 | Code | When it is reported | Amount in the JSON |
 |---|---|---|
