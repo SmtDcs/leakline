@@ -55,7 +55,7 @@ Same bytes, two policies, two exit codes. `examples/transparent-v5.hex` is `LEAK
 - ZIP-317 fee anomalies, linked transparent inputs, or a ZIP-321 payment-request match.
 - A constructed or broadcast transaction, or a check that a signature or a proof is valid. A `CLEAN` or `LEAK` byte string can still be rejected by a node.
 - That every file in `examples/` is a parsed, signed transaction. The v5 files and the empty PCZT are structural fixtures. The crossing file uses zero spend-auth and binding signatures. Its Sapling proof is 192 zero bytes, and its Orchard proof is empty. Do not broadcast them. `examples/truncated.hex` is a four-byte header and exits `2`. `examples/unknown-v9.hex` is `UNRECOGNIZED`.
-- A non-empty PCZT built through this crate's public API. The public roles can build an empty Nu6 PCZT. They cannot add inputs or a value sum. The v5 fixtures cover a transparent recipient and the Sapling and Orchard value balances. `REVEALED_SENDER` is covered by the decision table and the policy test, not by a v5 file. See `hackathon/10-pair-system.md`.
+- A non-empty PCZT built through this crate's public API. The public roles can build an empty Nu6 PCZT. They cannot add inputs or a value sum. The v5 fixtures cover a transparent recipient and the Sapling and Orchard value balances. `REVEALED_SENDER` is covered by the decision table and the policy test, not by a v5 file. See `docs/DESIGN.md`.
 
 ## How this differs from nearby tools
 

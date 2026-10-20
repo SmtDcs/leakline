@@ -1,4 +1,4 @@
-//! Decision table from `hackathon/10-pair-system.md`.
+//! Decision table from `docs/DESIGN.md`.
 //!
 //! This module does not parse bytes and does not guess transparent change.
 

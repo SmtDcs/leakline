@@ -1,22 +1,9 @@
 # secrets
 .env
 .env.*
-!.env.example
 *.key
 *.pem
 keystore/
-
-# foundry
-out/
-cache/
-broadcast/
-broadcast/*/dry-run/
-
-# node
-node_modules/
-.next/
-dist/
-coverage/
 
 # os and editor
 .DS_Store
@@ -25,9 +12,6 @@ coverage/
 
 # rust
 target/
-
-# pair logs may contain command output; never put keys here
-collab/*.log
 
 # recordings
 *.mp4
