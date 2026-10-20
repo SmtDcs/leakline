@@ -15,3 +15,5 @@ DeepSeek `cargo test --offline` çalıştırdı: o andaki 11 test geçti. Kaynak
 - `AllowLinkingAccountAddresses` transparent alıcıya izin vermez. Gönderen ve havuz geçişi yeter.
 - `PCZT_METADATA` Orchard ve Ironwood alanlarına da bakar. Merkle witness uyarı değildir.
 - Sapling ve Orchard bakiyesi olan bir v5 bayt dizisi iki politikada iki çıkış verir. `cargo test` 15 geçti.
+
+İkinci DeepSeek turu aynı 15 testi geçirdi ve karar hatası bulmadı. Üç delil notu vardı. Transparent çıktının gevşek politikada `CLEAN` olması hem karar tablosunda hem v5 baytında teste bağlandı. Kullanılmayan change alanı silindi. Boş olmayan PCZT, bu crate'in açık API'siyle kurulamıyor; o fark karar tablosunda ve imzalı baytta duruyor.

@@ -103,8 +103,6 @@ pub struct Exposure {
     /// Set only when every transparent input value is present, which is a PCZT case.
     pub transparent_input_zatoshis: Option<i64>,
     pub transparent_output_zatoshis: Vec<i64>,
-    /// Indexes PCZT marked as change. They stay public recipients under FullPrivacy.
-    pub change_output_indexes: Vec<u32>,
     pub sprout_zatoshis: i64,
     pub sapling_zatoshis: i64,
     pub orchard_zatoshis: i64,
@@ -119,7 +117,6 @@ impl Exposure {
             transparent_input_count: 0,
             transparent_input_zatoshis: None,
             transparent_output_zatoshis: Vec::new(),
-            change_output_indexes: Vec::new(),
             sprout_zatoshis: 0,
             sapling_zatoshis: 0,
             orchard_zatoshis: 0,
@@ -247,6 +244,12 @@ mod tests {
         assert_eq!(verdict.exit_code, 1);
         assert_eq!(verdict.codes, vec![Code::RevealedRecipient]);
         assert!(verdict.transparent_input_zatoshis.is_none());
+        let allowed = inspect(&tx, Policy::AllowRevealedRecipients);
+        assert_eq!(allowed.status, Status::Clean);
+        assert_eq!(allowed.exit_code, 0);
+        let no_privacy = inspect(&tx, Policy::NoPrivacy);
+        assert_eq!(no_privacy.status, Status::Clean);
+        assert_eq!(no_privacy.codes, vec![Code::RevealedRecipient]);
     }
 
     #[test]

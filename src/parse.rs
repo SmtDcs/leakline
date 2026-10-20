@@ -233,6 +233,10 @@ mod tests {
         assert_eq!(verdict.codes, vec![Code::RevealedRecipient]);
         assert_eq!(verdict.transparent_output_zatoshis, vec![100_000]);
         assert!(verdict.transparent_input_zatoshis.is_none());
+        let allowed = inspect_bytes(&bytes, Policy::AllowRevealedRecipients).unwrap();
+        assert_eq!(allowed.status, Status::Clean);
+        assert_eq!(allowed.exit_code, 0);
+        assert_eq!(allowed.codes, vec![Code::RevealedRecipient]);
     }
 
     #[test]

@@ -91,7 +91,7 @@ Adlar `zcashd` adlarıdır. Varsayılan `FullPrivacy`. Daha gevşek politika, ke
 1. Transparent çıktı. `FullPrivacy` → `LEAK` / `REVEALED_RECIPIENT`.
 2. Transparent parça yok, Sapling ve Orchard bakiyeleri ters işaretli ve sıfır değil. `FullPrivacy` → `LEAK` / `POOL_CROSSING`. `AllowRevealedAmounts` → `CLEAN`.
 3. Yalnız Orchard, bakiye sıfır ya da tek havuz ücret adayı. `FullPrivacy` → `CLEAN`.
-4. Aynı PCZT, `FullPrivacy` çıkış `1`, `AllowRevealedSenders` ya da `AllowRevealedAmounts` çıkış `0`. Hangisi değiştiyse o kod listede görünür.
+4. Aynı bayt, `FullPrivacy` çıkış `1`, daha gevşek bir politikada çıkış `0`. Hangisi değiştiyse o kod listede görünür. Bu crate'in açık API'si boş olmayan bir PCZT kuramıyor; o yüzden PCZT bayt testi boş bir Nu6 PCZT'dir. İki politikadaki fark, aynı alanları dolduran karar tablosunda ve imzalı v5 baytında durur.
 
 ## İddia dışı
 
