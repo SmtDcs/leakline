@@ -1,63 +1,10 @@
-# Project Name
+# ZECATHON 2026
 
-One-line description of the user outcome.
+zkSNARKs Zcash gizlilik hackathonu. Araştırma duruyor. Fikir seçilmedi, kod yok.
 
-[Live demo](https://example.com) · [Demo video](https://example.com) · [Contracts](#contracts)
+- Teslim: 28 Ekim 2026, 23:59 UTC
+- Brief: `hackathon/00-brief.md`
+- Track matrisi: `hackathon/04-sponsors.md`
+- Fikirler: `hackathon/02-idea.md`
 
-## Problem
-
-One user, one painful moment, one concrete number.
-
-## Solution
-
-What the product does and why the blockchain is required.
-
-## How it works
-
-```mermaid
-flowchart LR
-  U[User] --> W[Wallet]
-  W --> F[Frontend]
-  F --> C[Contracts]
-```
-
-## Contracts
-
-| Network | Contract | Address |
-|---|---|---|
-| Base Sepolia | | |
-
-## Sponsor integrations
-
-- Sponsor:
-- What it does:
-- Proof:
-
-## Run locally
-
-```bash
-git clone <repo>
-cd <repo>
-cp .env.example .env
-forge install
-forge test
-forge script script/Deploy.s.sol:Deploy --rpc-url $TESTNET_RPC_URL --account deployer --broadcast
-```
-
-## Tests
-
-```bash
-forge test -vvv
-```
-
-## Team
-
-- Name, role, link.
-
-## AI usage
-
-See [AI_USAGE.md](AI_USAGE.md).
-
-## License
-
-MIT
+Karar satırı: `Decision: pending user choice`.
