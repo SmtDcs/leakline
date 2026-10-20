@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Show the three Leakline classes on local hex. No network. No keys.
+# Show the Leakline classes on local hex: synthetic fixtures, then real testnet bytes.
+# No network. No keys.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -30,6 +31,13 @@ show FullPrivacy examples/orchard-fee-v5.hex 0
 show NoPrivacy examples/unknown-v9.hex 1
 show FullPrivacy examples/empty-v5.hex 0
 show FullPrivacy examples/empty-nu6.pczt.hex 0
+
+# Real bytes from public testnet (NU6.3, v6 transactions, Ironwood pool).
+show FullPrivacy examples/testnet/leak-transparent-v6.pczt.hex 1
+show FullPrivacy examples/testnet/clean-shielded-v6.pczt.hex 0
+show FullPrivacy examples/testnet/leak-transparent-v6.hex 1
+show AllowRevealedRecipients examples/testnet/leak-transparent-v6.hex 0
+show FullPrivacy examples/testnet/clean-shielded-v6.hex 0
 
 set +e
 "$bin" examples/truncated.hex >/dev/null
